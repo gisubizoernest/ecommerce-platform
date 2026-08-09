@@ -16,3 +16,7 @@ npm-debug.log*
 # editor
 .vscode/
 .DS_Store
+.agents/
+.claude/
+.windsurf/
+skills-lock.json
