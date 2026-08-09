@@ -7,7 +7,7 @@ import { Products } from './pages/Products'
 import { ProductDetail } from './pages/ProductDetail'
 import { Login } from './pages/Login'
 import { AdminNewProduct } from './pages/AdminNewProduct'
-
+import { Cart } from './pages/Cart'
 const queryClient = new QueryClient()
 
 function App() {
@@ -17,6 +17,7 @@ function App() {
         <Toaster position="top-right" />
         <Routes>
           <Route element={<Layout />}>
+            <Route path="/cart" element={<Cart />} />
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<Products />} />
             <Route path="/products/:slug" element={<ProductDetail />} />
