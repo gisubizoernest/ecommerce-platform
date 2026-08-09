@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
@@ -27,6 +28,18 @@ export function Cart() {
       api.put('/cart', { productId, quantity }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cart'] }),
   })
+  const [checkingOut, setCheckingOut] = useState(false)
+
+  async function handleCheckout() {
+    setCheckingOut(true)
+    try {
+      const res = await api.post('/checkout/create-session')
+      window.location.href = res.data.url
+    } catch {
+      toast.error('Failed to start checkout')
+      setCheckingOut(false)
+    }
+  }
 
   if (!token) {
     return (
@@ -70,7 +83,16 @@ export function Cart() {
               </button>
             </div>
           ))}
-          <div className="text-right text-xl font-bold pt-4">Total: ${total.toFixed(2)}</div>
+          <div className="text-right pt-4">
+  <p className="text-xl font-bold">Total: ${total.toFixed(2)}</p>
+  <button
+    onClick={handleCheckout}
+    disabled={checkingOut}
+    className="mt-4 bg-gray-900 text-white rounded-lg px-6 py-3 font-medium hover:bg-gray-800"
+  >
+    {checkingOut ? 'Redirecting...' : 'Proceed to Checkout'}
+  </button>
+</div>
         </div>
       )}
     </div>
