@@ -24,6 +24,9 @@ export function Navbar() {
         <nav className="hidden md:flex gap-8 text-sm font-medium text-gray-600">
           <Link to="/products" className="hover:text-gray-900">Products</Link>
           <Link to="/categories" className="hover:text-gray-900">Categories</Link>
+          {user?.role === 'ADMIN' && (
+  <Link to="/admin" className="hover:text-gray-900">Admin</Link>
+)}
         </nav>
         <div className="flex items-center gap-4">
           <Link to="/cart" className="relative text-gray-600 hover:text-gray-900">

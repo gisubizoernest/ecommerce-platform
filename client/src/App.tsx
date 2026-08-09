@@ -9,6 +9,9 @@ import { Login } from './pages/Login'
 import { AdminNewProduct } from './pages/AdminNewProduct'
 import { Cart } from './pages/Cart'
 import { CheckoutSuccess } from './pages/CheckoutSuccess'
+import { AdminRoute } from './components/AdminRoute'
+import { AdminDashboard } from './pages/AdminDashboard'
+import { AdminOrders } from './pages/AdminOrders'
 const queryClient = new QueryClient()
 
 function App() {
@@ -26,6 +29,11 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/admin/products/new" element={<AdminNewProduct />} />
           </Route>
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/orders" element={<AdminOrders />} />
+            <Route path="/admin/products/new" element={<AdminNewProduct />} />
+</Route>
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
