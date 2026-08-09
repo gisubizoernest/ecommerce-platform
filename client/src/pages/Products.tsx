@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/axios'
 
@@ -17,10 +18,11 @@ export function Products() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {data?.map((p: any) => (
-            <div key={p.id} className="border border-gray-200 rounded-xl p-4">
+            <Link key={p.id} to={`/products/${p.slug}`} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition">
+              <img src={p.images} alt={p.name} className="w-full aspect-square object-cover rounded-lg bg-gray-100 mb-3" />
               <h3 className="font-semibold">{p.name}</h3>
               <p className="text-gray-500 text-sm">${p.price}</p>
-            </div>
+            </Link>
           ))}
         </div>
       )}
