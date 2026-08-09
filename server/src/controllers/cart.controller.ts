@@ -22,6 +22,6 @@ export async function updateItem(req: AuthRequest, res: Response) {
 }
 
 export async function removeItem(req: AuthRequest, res: Response) {
-  await removeFromCart(req.user!.id, req.params.productId)
+ await removeFromCart(req.user!.id, req.params.productId as string)
   res.status(204).send()
 }
