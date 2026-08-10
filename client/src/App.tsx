@@ -16,6 +16,7 @@ import { Categories } from './pages/Categories'
 import { AdminProducts } from './pages/AdminProducts'
 import { AdminEditProduct } from './pages/AdminEditProduct'
 import { Wishlist } from './pages/Wishlist'
+import { Orders } from './pages/Orders'
 
 const queryClient = new QueryClient()
 
@@ -34,6 +35,7 @@ function App() {
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/checkout/success" element={<CheckoutSuccess />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/orders" element={<Orders />} />
 
             <Route element={<AdminRoute />}>
               <Route path="/admin" element={<AdminDashboard />} />

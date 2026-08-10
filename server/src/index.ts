@@ -10,6 +10,8 @@ import cartRoutes from './routes/cart.routes'
 import adminRoutes from './routes/admin.routes'
 import reviewRoutes from './routes/review.routes'
 import wishlistRoutes from './routes/wishlist.routes'
+import addressRoutes from './routes/address.routes'
+import customerOrderRoutes from './routes/customerOrder.routes'
 dotenv.config()
 
 const app = express()
@@ -17,6 +19,8 @@ app.use(cors())
 app.use(express.json())
 app.use('/api/checkout', checkoutRoutes)
 app.use('/api/admin', adminRoutes)
+app.use('/api/addresses', addressRoutes)
+app.use('/api/my-orders', customerOrderRoutes)
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: 'Server is running' })

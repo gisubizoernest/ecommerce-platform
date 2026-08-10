@@ -62,9 +62,12 @@ export function Navbar() {
               <span className="text-xs text-gray-300 hidden sm:block">
                 Hi, <span className="font-semibold text-white">{user.name.split(' ')[0]}</span>
               </span>
-              <button onClick={logout} className="text-xs font-medium text-gray-300 hover:text-white transition-colors">
-                Sign out
-              </button>
+              <Link to="/orders" className="text-xs font-medium text-gray-300 hover:text-white transition-colors">
+  Orders
+</Link>
+<button onClick={logout} className="text-xs font-medium text-gray-300 hover:text-white transition-colors">
+  Sign out
+</button>
             </div>
           ) : (
             <Link to="/login" className="flex items-center gap-1.5 text-gray-200 hover:text-white transition-colors">

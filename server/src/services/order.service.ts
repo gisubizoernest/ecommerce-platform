@@ -1,7 +1,7 @@
 import { prisma } from '../config/prisma'
 import { stripe } from '../config/stripe'
 
-export async function createCheckoutSession(userId: string) {
+export async function createCheckoutSession(userId: string, addressId: string) {
   const cartItems = await prisma.cartItem.findMany({
     where: { userId },
     include: { product: true },
@@ -24,7 +24,7 @@ export async function createCheckoutSession(userId: string) {
     line_items,
     success_url: `http://localhost:5173/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `http://localhost:5173/cart`,
-    metadata: { userId },
+    metadata: { userId, addressId },
   })
 
   return session.url
@@ -46,14 +46,16 @@ export async function confirmOrder(sessionId: string) {
 
   const total = cartItems.reduce((sum, item) => sum + Number(item.product.price) * item.quantity, 0)
 
+  const address = await prisma.address.findUnique({ where: { id: session.metadata?.addressId as string } })
+
   const order = await prisma.order.create({
     data: {
       userId,
       total,
-      shippingLine1: 'N/A',
-      shippingCity: 'N/A',
-      shippingState: 'N/A',
-      shippingZip: 'N/A',
+      shippingLine1: address?.line1 || 'N/A',
+      shippingCity: address?.city || 'N/A',
+      shippingState: address?.state || 'N/A',
+      shippingZip: address?.postalCode || 'N/A',
       status: 'PAID',
       items: {
         create: cartItems.map((item) => ({
