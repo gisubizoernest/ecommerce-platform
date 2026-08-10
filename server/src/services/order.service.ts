@@ -1,7 +1,7 @@
 import { prisma } from '../config/prisma'
 import { stripe } from '../config/stripe'
 
-export async function createCheckoutSession(userId: string, addressId: string) {
+export async function createCheckoutSession(userId: string, addressId: string, couponCode?: string) {
   const cartItems = await prisma.cartItem.findMany({
     where: { userId },
     include: { product: true },
@@ -9,14 +9,26 @@ export async function createCheckoutSession(userId: string, addressId: string) {
 
   if (cartItems.length === 0) throw new Error('Cart is empty')
 
-  const line_items = cartItems.map((item) => ({
-    price_data: {
-      currency: 'usd',
-      product_data: { name: item.product.name },
-      unit_amount: Math.round(Number(item.product.price) * 100),
-    },
-    quantity: item.quantity,
-  }))
+  let discountPct = 0
+  if (couponCode) {
+    const coupon = await prisma.coupon.findUnique({ where: { code: couponCode.toUpperCase() } })
+    if (coupon && coupon.isActive && (!coupon.expiresAt || coupon.expiresAt > new Date())) {
+      discountPct = coupon.discountPct
+    }
+  }
+
+  const line_items = cartItems.map((item) => {
+    const price = Number(item.product.price)
+    const finalPrice = discountPct ? price - (price * discountPct) / 100 : price
+    return {
+      price_data: {
+        currency: 'usd',
+        product_data: { name: item.product.name },
+        unit_amount: Math.round(finalPrice * 100),
+      },
+      quantity: item.quantity,
+    }
+  })
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
@@ -29,7 +41,6 @@ export async function createCheckoutSession(userId: string, addressId: string) {
 
   return session.url
 }
-
 export async function confirmOrder(sessionId: string) {
   const session = await stripe.checkout.sessions.retrieve(sessionId)
   if (session.payment_status !== 'paid') throw new Error('Payment not completed')

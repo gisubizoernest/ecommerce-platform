@@ -3,10 +3,10 @@ import { AuthRequest } from '../middleware/auth.middleware'
 import { createCheckoutSession, confirmOrder } from '../services/order.service'
 
 export async function startCheckout(req: AuthRequest, res: Response) {
-  const { addressId } = req.body
+  const { addressId, couponCode } = req.body
   if (!addressId) return res.status(400).json({ message: 'addressId is required' })
   try {
-    const url = await createCheckoutSession(req.user!.id, addressId)
+    const url = await createCheckoutSession(req.user!.id, addressId, couponCode)
     res.json({ url })
   } catch (err: any) {
     res.status(400).json({ message: err.message })

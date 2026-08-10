@@ -18,6 +18,7 @@ import { AdminEditProduct } from './pages/AdminEditProduct'
 import { Wishlist } from './pages/Wishlist'
 import { Orders } from './pages/Orders'
 import { AdminCustomers } from './pages/AdminCustomers'
+import { AdminCoupons } from './pages/AdminCoupons'
 
 const queryClient = new QueryClient()
 
@@ -45,6 +46,7 @@ function App() {
               <Route path="/admin/products/new" element={<AdminNewProduct />} />
               <Route path="/admin/products/:id/edit" element={<AdminEditProduct />} />
               <Route path="/admin/customers" element={<AdminCustomers />} />
+              <Route path="/admin/coupons" element={<AdminCoupons />} />
             </Route>
           </Route>
         </Routes>

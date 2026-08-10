@@ -33,6 +33,7 @@ export function AdminDashboard() {
         <Link to="/admin/products/new" className="text-sm font-medium text-gray-900 underline">Add Product</Link>
         <Link to="/admin/products" className="text-sm font-medium text-gray-900 underline">Manage Products</Link>
         <Link to="/admin/customers" className="text-sm font-medium text-gray-900 underline">Manage Customers</Link> 
+        <Link to="/admin/coupons" className="text-sm font-medium text-gray-900 underline">Manage Coupons</Link>.
       </div>
     </div>
   )

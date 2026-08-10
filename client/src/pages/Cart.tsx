@@ -13,7 +13,8 @@ export function Cart() {
   const [selectedAddressId, setSelectedAddressId] = useState('')
   const [showAddressForm, setShowAddressForm] = useState(false)
   const [addressForm, setAddressForm] = useState({ line1: '', city: '', state: '', postalCode: '', country: '' })
-
+  const [couponCode, setCouponCode] = useState('')
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null)   
   const { data: items, isLoading } = useQuery({
     queryKey: ['cart'],
     queryFn: () => api.get('/cart').then((res) => res.data),
@@ -51,12 +52,23 @@ export function Cart() {
     },
     onError: () => toast.error('Failed to save address'),
   })
+  const applyCouponMutation = useMutation({
+    mutationFn: () => api.post('/coupons/validate', { code: couponCode }),
+    onSuccess: (res) => {
+      setAppliedCoupon(res.data)
+      toast.success(`Coupon applied: ${res.data.discountPct}% off`)
+    },
+    onError: (err: any) => toast.error(err.response?.data?.message || 'Invalid coupon'),
+  })
 
-  async function handleCheckout() {
+async function handleCheckout() {
     if (!selectedAddressId) return toast.error('Please select a delivery address')
     setCheckingOut(true)
     try {
-      const res = await api.post('/checkout/create-session', { addressId: selectedAddressId })
+      const res = await api.post('/checkout/create-session', {
+        addressId: selectedAddressId,
+        couponCode: appliedCoupon?.code,
+      })
       window.location.href = res.data.url
     } catch {
       toast.error('Failed to start checkout')
@@ -75,7 +87,8 @@ export function Cart() {
 
   if (isLoading) return <p>Loading cart...</p>
 
-  const total = items?.reduce((sum: number, item: any) => sum + item.product.price * item.quantity, 0) || 0
+  const subtotal = items?.reduce((sum: number, item: any) => sum + item.product.price * item.quantity, 0) || 0
+  const total = appliedCoupon ? subtotal - (subtotal * appliedCoupon.discountPct) / 100 : subtotal
 
   return (
     <div>
@@ -147,8 +160,28 @@ export function Cart() {
                 </button>
               </div>
             )}
-
-            <div className="border-t pt-4" style={{ borderColor: 'var(--color-border)' }}>
+<div className="border-t pt-4" style={{ borderColor: 'var(--color-border)' }}>
+              <div className="flex gap-2 mb-3">
+                <input
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  placeholder="Coupon code"
+                  className="flex-1 border rounded-lg px-3 py-1.5 text-sm"
+                  style={{ borderColor: 'var(--color-border)' }}
+                />
+                <button
+                  onClick={() => applyCouponMutation.mutate()}
+                  className="text-sm font-medium px-3 rounded-lg border"
+                  style={{ borderColor: 'var(--color-border)' }}
+                >
+                  Apply
+                </button>
+              </div>
+              {appliedCoupon && (
+                <p className="text-sm mb-2" style={{ color: 'var(--color-success)' }}>
+                  {appliedCoupon.code} applied (-{appliedCoupon.discountPct}%)
+                </p>
+              )}
               <p className="text-xl font-bold mb-3">Total: ${total.toFixed(2)}</p>
               <button
                 onClick={handleCheckout}
