@@ -31,6 +31,7 @@ export function AdminDashboard() {
       <div className="flex gap-4">
         <Link to="/admin/orders" className="text-sm font-medium text-gray-900 underline">View Orders</Link>
         <Link to="/admin/products/new" className="text-sm font-medium text-gray-900 underline">Add Product</Link>
+        <Link to="/admin/products" className="text-sm font-medium text-gray-900 underline">Manage Products</Link>
       </div>
     </div>
   )

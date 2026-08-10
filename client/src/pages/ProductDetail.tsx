@@ -2,13 +2,13 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { Star } from 'lucide-react'
+import { Star, Heart } from 'lucide-react'
 import { api } from '../lib/axios'
 import { useAuthStore } from '../store/auth.store'
 
 export function ProductDetail() {
   const { slug } = useParams()
-  const { token, user } = useAuthStore()
+  const { token } = useAuthStore()
   const queryClient = useQueryClient()
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
@@ -18,6 +18,13 @@ export function ProductDetail() {
     queryFn: () => api.get(`/products/${slug}`).then((res) => res.data),
   })
 
+  const { data: wishlist } = useQuery({
+    queryKey: ['wishlist'],
+    queryFn: () => api.get('/wishlist').then((res) => res.data),
+    enabled: !!token,
+  })
+  const isWishlisted = wishlist?.some((w: any) => w.productId === product?.id)
+
   const addToCartMutation = useMutation({
     mutationFn: (productId: string) => api.post('/cart', { productId, quantity: 1 }),
     onSuccess: () => {
@@ -25,6 +32,18 @@ export function ProductDetail() {
       toast.success('Added to cart')
     },
     onError: () => toast.error('Failed to add to cart'),
+  })
+
+  const wishlistMutation = useMutation({
+    mutationFn: () =>
+      isWishlisted
+        ? api.delete(`/wishlist/${product.id}`)
+        : api.post('/wishlist', { productId: product.id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wishlist'] })
+      toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist')
+    },
+    onError: () => toast.error('Wishlist action failed'),
   })
 
   const reviewMutation = useMutation({
@@ -67,16 +86,29 @@ export function ProductDetail() {
           <p className="text-xl font-bold mt-3" style={{ color: 'var(--color-accent-dark)' }}>${product.price}</p>
           <p className="text-gray-500 mt-4">{product.description}</p>
           <p className="text-sm text-gray-400 mt-2">SKU: {product.sku} · Stock: {product.stock}</p>
-          <button
-            onClick={() => {
-              if (!token) return toast.error('Please sign in first')
-              addToCartMutation.mutate(product.id)
-            }}
-            className="mt-6 text-white rounded-lg px-6 py-3 font-medium"
-            style={{ background: 'var(--color-accent)' }}
-          >
-            Add to Cart
-          </button>
+
+          <div className="flex gap-3 mt-6">
+            <button
+              onClick={() => {
+                if (!token) return toast.error('Please sign in first')
+                addToCartMutation.mutate(product.id)
+              }}
+              className="text-white rounded-lg px-6 py-3 font-medium"
+              style={{ background: 'var(--color-accent)' }}
+            >
+              Add to Cart
+            </button>
+            <button
+              onClick={() => {
+                if (!token) return toast.error('Please sign in first')
+                wishlistMutation.mutate()
+              }}
+              className="rounded-lg px-4 py-3 border flex items-center justify-center"
+              style={{ borderColor: 'var(--color-border)' }}
+            >
+              <Heart size={20} fill={isWishlisted ? 'var(--color-accent)' : 'none'} color="var(--color-accent)" />
+            </button>
+          </div>
         </div>
       </div>
 

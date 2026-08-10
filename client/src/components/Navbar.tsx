@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { ShoppingCart, User, Search, ShieldCheck } from 'lucide-react'
+import { ShoppingCart, User, Search, ShieldCheck, Heart } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '../store/auth.store'
 import { api } from '../lib/axios'
@@ -72,6 +72,9 @@ export function Navbar() {
               <span className="text-xs font-medium hidden sm:block">Sign in</span>
             </Link>
           )}
+          <Link to="/wishlist" className="text-gray-200 hover:text-white transition-colors">
+            <Heart size={20} />
+          </Link>
           <Link to="/cart" className="relative flex items-center gap-1.5 text-gray-200 hover:text-white transition-colors">
             <ShoppingCart size={20} />
             {cartCount > 0 && (
