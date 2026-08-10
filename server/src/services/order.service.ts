@@ -1,3 +1,4 @@
+import { sendOrderConfirmationEmail } from './email.service'
 import { prisma } from '../config/prisma'
 import { stripe } from '../config/stripe'
 
@@ -85,8 +86,14 @@ export async function confirmOrder(sessionId: string) {
     },
     include: { items: true },
   })
-
-  await prisma.cartItem.deleteMany({ where: { userId } })
+const user = await prisma.user.findUnique({ where: { id: userId } })
+  const orderWithItems = await prisma.order.findUnique({
+    where: { id: order.id },
+    include: { items: { include: { product: true } } },
+  })
+  if (user && orderWithItems) {
+    await sendOrderConfirmationEmail(user.email, orderWithItems)
+  }
 
   return order
 }
