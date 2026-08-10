@@ -13,6 +13,7 @@ import wishlistRoutes from './routes/wishlist.routes'
 import addressRoutes from './routes/address.routes'
 import customerOrderRoutes from './routes/customerOrder.routes'
 import couponRoutes from './routes/coupon.routes'
+import uploadRoutes from './routes/upload.routes'
 dotenv.config()
 
 const app = express()
@@ -23,7 +24,7 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/addresses', addressRoutes)
 app.use('/api/my-orders', customerOrderRoutes)
 app.use('/api/coupons', couponRoutes)
-
+app.use('/api/upload', uploadRoutes)
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: 'Server is running' })
 })
